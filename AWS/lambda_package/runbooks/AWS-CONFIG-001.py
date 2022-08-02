@@ -93,9 +93,9 @@ def remediate(session, alert, lambda_context):
 
   # Results
   if start_result != 'fail':
-    print('AWS Config enabled in region {}.'.format(region))
+    print(f'AWS Config enabled in region {region}.')
   else:
-    print('Failed to enable AWS Config in region {}.'.format(region))
+    print(f'Failed to enable AWS Config in region {region}.')
 
   return
 
@@ -105,7 +105,7 @@ def new_iam_role(iam, region):
   Create new IAM Role and attach AWS Config Managed Policy
   """
 
-  role_name = 'config-role-' + region
+  role_name = f'config-role-{region}'
 
   try:
     role = iam.create_role(
@@ -115,7 +115,7 @@ def new_iam_role(iam, region):
     )
     role_arn = role['Role']['Arn']
 
-    print('New IAM Role created: {}'.format(role_arn))
+    print(f'New IAM Role created: {role_arn}')
     sleep(10)  # Wait for IAM resource to be available. >> Gotta be a better way.. { wait? get? }.
 
   except ClientError as e:
@@ -125,7 +125,7 @@ def new_iam_role(iam, region):
       )
       role_arn = role['Role']['Arn']
 
-      print('Using existing IAM Role: {}'.format(role_arn))
+      print(f'Using existing IAM Role: {role_arn}')
 
     else:
       print(e.response['Error']['Message'])
@@ -150,7 +150,7 @@ def new_s3_bucket(s3, account_id, region):
   Create new S3 Bucket
   """
 
-  bucket_name = 'config-bucket-' + account_id
+  bucket_name = f'config-bucket-{account_id}'
 
   try:
     if region == 'us-east-1':
@@ -165,13 +165,13 @@ def new_s3_bucket(s3, account_id, region):
         CreateBucketConfiguration = {'LocationConstraint': region}
       )
 
-    print('New S3 bucket created: {}'.format(bucket_name))
+    print(f'New S3 bucket created: {bucket_name}')
 
   except ClientError as e:
     if e.response['Error']['Code'] == 'BucketAlreadyExists':
-      print('Using existing S3 bucket: {}'.format(bucket_name))
+      print(f'Using existing S3 bucket: {bucket_name}')
     elif e.response['Error']['Code'] == 'BucketAlreadyOwnedByYou':
-      print('Using already owned and existing S3 bucket: {}'.format(bucket_name))
+      print(f'Using already owned and existing S3 bucket: {bucket_name}')
     else:
       print(e.response['Error']['Message'])
       return 'fail'
@@ -206,7 +206,7 @@ def new_config_recorder(config, role_arn):
       }
     )
 
-    print('New Config recorder created: {}'.format(recorder_name))
+    print(f'New Config recorder created: {recorder_name}')
 
   except ClientError as e:
     print(e.response['Error']['Message'])
@@ -233,7 +233,7 @@ def new_config_channel(config, bucket_name):
       }
     )
 
-    print('New Config delivery channel created: {}'.format(channel_name))
+    print(f'New Config delivery channel created: {channel_name}')
 
   except ClientError as e:
     print(e.response['Error']['Message'])
@@ -276,40 +276,35 @@ class RoleTemplate:
 
 class BucketTemplate():
 
-  def BucketPolicy(bucket_name, account_id):
+  def BucketPolicy(self, account_id):
 
-    Policy = {
-               'Version': '2012-10-17',
-               'Statement': [
-                 {
-                   'Sid': 'AWSConfigBucketPermissionsCheck',
-                   'Effect': 'Allow',
-                   'Principal': {
-                     'Service': [
-                       'config.amazonaws.com'
-                     ]
-                   },
-                   'Action': 's3:GetBucketAcl',
-                   'Resource': 'arn:aws:s3:::' + bucket_name
-                 },
-                 {
-                   'Sid': ' AWSConfigBucketDelivery',
-                   'Effect': 'Allow',
-                   'Principal': {
-                     'Service': [
-                       'config.amazonaws.com'    
-                     ]
-                   },
-                   'Action': 's3:PutObject',
-                   'Resource': 'arn:aws:s3:::' + bucket_name + '/AWSLogs/' + account_id + '/Config/*',
-                   'Condition': { 
-                     'StringEquals': { 
-                       's3:x-amz-acl': 'bucket-owner-full-control' 
-                     }
-                   }
-                 }
-               ]
-             }   
-
-    return Policy
+    return {
+        'Version':
+        '2012-10-17',
+        'Statement': [
+            {
+                'Sid': 'AWSConfigBucketPermissionsCheck',
+                'Effect': 'Allow',
+                'Principal': {
+                    'Service': ['config.amazonaws.com']
+                },
+                'Action': 's3:GetBucketAcl',
+                'Resource': f'arn:aws:s3:::{self}',
+            },
+            {
+                'Sid': ' AWSConfigBucketDelivery',
+                'Effect': 'Allow',
+                'Principal': {
+                    'Service': ['config.amazonaws.com']
+                },
+                'Action': 's3:PutObject',
+                'Resource': f'arn:aws:s3:::{self}/AWSLogs/{account_id}/Config/*',
+                'Condition': {
+                    'StringEquals': {
+                        's3:x-amz-acl': 'bucket-owner-full-control'
+                    }
+                },
+            },
+        ],
+    }
 

@@ -80,7 +80,7 @@ def deactivate_access_key(iam, key_id, user_name):
     print(e.response['Error']['Message'])
 
   else:
-    print('Deactivated access key {} for user {}.'.format(key_id, user_name))
+    print(f'Deactivated access key {key_id} for user {user_name}.')
 
   return
 

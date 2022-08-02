@@ -56,7 +56,7 @@ def remediate(session, alert, lambda_context):
     return
 
   else:
-    print('Object Versioning enabled for S3 bucket: {}.'.format(bucket))
+    print(f'Object Versioning enabled for S3 bucket: {bucket}.')
 
   return
 

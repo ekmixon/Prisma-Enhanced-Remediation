@@ -75,14 +75,14 @@ def remediate(session, alert, lambda_context):
     return
 
   if not trail:
-    print('Error: Unable to find Trail {}.'.format(trail_name))
+    print(f'Error: Unable to find Trail {trail_name}.')
     return
 
   # Check the Trail home region
   try:
     home_region = trail[0]['HomeRegion']
   except (KeyError, IndexError):
-    print('Error: Unable to determine the home region for Trail {}.'.format(trail_name))
+    print(f'Error: Unable to determine the home region for Trail {trail_name}.')
     return
 
   else:
@@ -95,13 +95,13 @@ def remediate(session, alert, lambda_context):
   except (KeyError, IndexError):
     trail_key = None
 
-  if trail_key == None:
+  if trail_key is None:
 
     # Grab the Trail Arn (we need the Account Id)
     try:
       trail_arn  = trail[0]['TrailARN']
     except (KeyError, IndexError):
-      print('Error: Unable to find the ARN for Trail {}.'.format(trail_name))
+      print(f'Error: Unable to find the ARN for Trail {trail_name}.')
       return
 
     else:
@@ -111,7 +111,7 @@ def remediate(session, alert, lambda_context):
     try:
       trail_bucket = trail[0]['S3BucketName']
     except (KeyError, IndexError):
-      print('Error: Unable to find the S3 logging bucket for Trail {}.'.format(trail_name))
+      print(f'Error: Unable to find the S3 logging bucket for Trail {trail_name}.')
       return
 
     # Find the Trail S3 logging bucket location (region)
@@ -147,7 +147,9 @@ def update_trail_cmk(clt, trail_name, key_id):
     print(e.response['Error']['Message'])
 
   else:
-    print('Updated Trail {} with KMS Customer Managed encryption Key: {}.'.format(trail_name, key_id))
+    print(
+        f'Updated Trail {trail_name} with KMS Customer Managed encryption Key: {key_id}.'
+    )
 
   return
 
@@ -160,7 +162,7 @@ def create_cmk(session, account_id, trail_name, bucket_region):
   # Create KMS client session in the same region as the Trail S3 logging bucket
   kms = session.client('kms', region_name=bucket_region)
 
-  cmk_alias_name = 'alias/' + trail_name + '-cloudtrail-key'
+  cmk_alias_name = f'alias/{trail_name}-cloudtrail-key'
 
   # Create CMK
   try:
@@ -195,101 +197,96 @@ class KMSTemplate:
   @staticmethod
   def CMKPolicy(account_id, bucket_region):
 
-    Policy = {
-               'Version': '2012-10-17',
-               'Id': 'Key policy created by CloudTrail',
-               'Statement': [
-                 {
-                   'Sid': 'Enable IAM User Permissions',
-                   'Effect': 'Allow',
-                   'Principal': {
-                     'AWS': [
-                       'arn:aws:iam::' + account_id + ':root'
-                     ]
-                   },
-                   'Action': 'kms:*',
-                   'Resource': '*'
-                 },
-                 {
-                   'Sid': 'Allow CloudTrail to encrypt logs',
-                   'Effect': 'Allow',
-                   'Principal': {
-                     'Service': 'cloudtrail.amazonaws.com'
-                   },
-                   'Action': 'kms:GenerateDataKey*',
-                   'Resource': '*',
-                   'Condition': {
-                     'StringLike': {
-                       'kms:EncryptionContext:aws:cloudtrail:arn': 'arn:aws:cloudtrail:*:' + account_id + ':trail/*'
-                     }
-                   }
-                 },
-                 {
-                   'Sid': 'Allow CloudTrail to describe key',
-                   'Effect': 'Allow',
-                   'Principal': {
-                     'Service': 'cloudtrail.amazonaws.com'
-                   },
-                   'Action': 'kms:DescribeKey',
-                   'Resource': '*'
-                 },
-                 {
-                   'Sid': 'Allow principals in the account to decrypt log files',
-                   'Effect': 'Allow',
-                   'Principal': {
-                     'AWS': '*'
-                   },
-                   'Action': [
-                     'kms:Decrypt',
-                     'kms:ReEncryptFrom'
-                   ],
-                   'Resource': '*',
-                   'Condition': {
-                     'StringEquals': {
-                       'kms:CallerAccount': account_id
-                     },
-                     'StringLike': {
-                       'kms:EncryptionContext:aws:cloudtrail:arn': 'arn:aws:cloudtrail:*:' + account_id + ':trail/*'
-                     }
-                   }
-                 },
-                 {
-                   'Sid': 'Allow alias creation during setup',
-                   'Effect': 'Allow',
-                   'Principal': {
-                     'AWS': '*'
-                   },
-                   'Action': 'kms:CreateAlias',
-                   'Resource': '*',
-                   'Condition': {
-                     'StringEquals': {
-                       'kms:CallerAccount': account_id,
-                       'kms:ViaService': 'ec2.' + bucket_region + '.amazonaws.com'
-                     }
-                   }
-                 },
-                 {
-                   'Sid': 'Enable cross account log decryption',
-                   'Effect': 'Allow',
-                   'Principal': {
-                     'AWS': '*'
-                   },
-                   'Action': [
-                     'kms:Decrypt',
-                     'kms:ReEncryptFrom'
-                   ],
-                   'Resource': '*',
-                   'Condition': {
-                     'StringEquals': {
-                       'kms:CallerAccount': account_id
-                     },
-                     'StringLike': {
-                       'kms:EncryptionContext:aws:cloudtrail:arn': 'arn:aws:cloudtrail:*:' + account_id + ':trail/*'
-                     }
-                   }
-                 }
-               ]
-             }
-
-    return Policy
+    return {
+        'Version':
+        '2012-10-17',
+        'Id':
+        'Key policy created by CloudTrail',
+        'Statement': [
+            {
+                'Sid': 'Enable IAM User Permissions',
+                'Effect': 'Allow',
+                'Principal': {
+                    'AWS': [f'arn:aws:iam::{account_id}:root']
+                },
+                'Action': 'kms:*',
+                'Resource': '*',
+            },
+            {
+                'Sid': 'Allow CloudTrail to encrypt logs',
+                'Effect': 'Allow',
+                'Principal': {
+                    'Service': 'cloudtrail.amazonaws.com'
+                },
+                'Action': 'kms:GenerateDataKey*',
+                'Resource': '*',
+                'Condition': {
+                    'StringLike': {
+                        'kms:EncryptionContext:aws:cloudtrail:arn':
+                        f'arn:aws:cloudtrail:*:{account_id}:trail/*'
+                    }
+                },
+            },
+            {
+                'Sid': 'Allow CloudTrail to describe key',
+                'Effect': 'Allow',
+                'Principal': {
+                    'Service': 'cloudtrail.amazonaws.com'
+                },
+                'Action': 'kms:DescribeKey',
+                'Resource': '*',
+            },
+            {
+                'Sid': 'Allow principals in the account to decrypt log files',
+                'Effect': 'Allow',
+                'Principal': {
+                    'AWS': '*'
+                },
+                'Action': ['kms:Decrypt', 'kms:ReEncryptFrom'],
+                'Resource': '*',
+                'Condition': {
+                    'StringEquals': {
+                        'kms:CallerAccount': account_id
+                    },
+                    'StringLike': {
+                        'kms:EncryptionContext:aws:cloudtrail:arn':
+                        f'arn:aws:cloudtrail:*:{account_id}:trail/*'
+                    },
+                },
+            },
+            {
+                'Sid': 'Allow alias creation during setup',
+                'Effect': 'Allow',
+                'Principal': {
+                    'AWS': '*'
+                },
+                'Action': 'kms:CreateAlias',
+                'Resource': '*',
+                'Condition': {
+                    'StringEquals': {
+                        'kms:CallerAccount': account_id,
+                        'kms:ViaService': f'ec2.{bucket_region}.amazonaws.com',
+                    }
+                },
+            },
+            {
+                'Sid': 'Enable cross account log decryption',
+                'Effect': 'Allow',
+                'Principal': {
+                    'AWS': '*'
+                },
+                'Action': ['kms:Decrypt', 'kms:ReEncryptFrom'],
+                'Resource': '*',
+                'Condition': {
+                    'StringEquals': {
+                        'kms:CallerAccount': account_id
+                    },
+                    'StringLike': {
+                        'kms:EncryptionContext:aws:cloudtrail:arn':
+                        f'arn:aws:cloudtrail:*:{account_id}:trail/*'
+                    },
+                },
+            },
+        ],
+    }
 

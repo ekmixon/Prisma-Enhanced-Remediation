@@ -74,7 +74,7 @@ def enable_term_protection(cfn, stack_name):
   except ClientError as e:
     print(e.response['Error']['Message'])
   else:
-    print('Enabled termination protection for CloudFormation Stack {}.'.format(stack_name))
+    print(f'Enabled termination protection for CloudFormation Stack {stack_name}.')
 
   return
 

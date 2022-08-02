@@ -50,12 +50,10 @@ def remediate(session, alert, lambda_context):
     print(e.response['Error']['Message'])
     return
 
-  new_bucket_acl = {}
-  new_bucket_acl['Owner'] = bucket_acl['Owner']
-
+  new_bucket_acl = {'Owner': bucket_acl['Owner']}
   new_grants = []
   public = False
-  
+
   for grant in bucket_acl['Grants']:
     try:
       grant_type = grant['Grantee']['Type']
@@ -75,7 +73,7 @@ def remediate(session, alert, lambda_context):
   # Remediate
   if public == True:
     result = remove_public_acl(s3, bucket_name, new_bucket_acl)
-    
+
   return
 
 
@@ -92,7 +90,7 @@ def remove_public_acl(s3, bucket_name, new_bucket_acl):
   except ClientError as e:
     print(e.response['Error']['Message'])
   else:
-    print('Global access removed from S3 bucket {} ACL policy.'.format(bucket_name))
+    print(f'Global access removed from S3 bucket {bucket_name} ACL policy.')
 
   return
 

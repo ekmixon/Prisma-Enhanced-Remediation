@@ -63,7 +63,7 @@ def remediate(session, alert, lambda_context):
 
   # Check for default security group
   if group[0]['GroupName'] != 'default':
-    print('Security group {} is not the default.'.format(sg_id))
+    print(f'Security group {sg_id} is not the default.')
     return
 
   # Revoke all ingress permissions
@@ -113,7 +113,7 @@ def remove_sg_rule(ec2, sg_id, ip_perm, revoke):
   else:
     return
 
-  print('Revoked {} rule {} from default security group {}.'.format(revoke, ip_perm, sg_id))
+  print(f'Revoked {revoke} rule {ip_perm} from default security group {sg_id}.')
 
   return
 

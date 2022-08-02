@@ -70,13 +70,13 @@ def remediate(session, alert, lambda_context):
     today = date.today()                           # Today's date
     delta = today - snap_date                      # The diff
 
-    snapshot_needed = True if (delta.days >= snapshot_age) else False
+    snapshot_needed = delta.days >= snapshot_age
   else:
     snapshot_needed = True
 
-  if snapshot_needed == True:
+  if snapshot_needed:
     response = new_ebs_snapshot(ec2, volume_id)
-    
+
   return
 
 
@@ -89,7 +89,7 @@ def new_ebs_snapshot(ec2, volume_id):
     response = ec2.create_snapshot(VolumeId=volume_id, Description='Autoremediate snapshot')
     snapshot_id = response['SnapshotId']
 
-    print('New snapshot {} created for EBS Volume {}.'.format(snapshot_id, volume_id))
+    print(f'New snapshot {snapshot_id} created for EBS Volume {volume_id}.')
 
   except ClientError as e:
     print(e.response['Error']['Message'])

@@ -50,17 +50,17 @@ def remediate(session, alert, lambda_context):
 
   try:
     key_metadata = kms.describe_key(KeyId = key_id)['KeyMetadata']
-  
+
   except ClientError as e:
     print(e.response['Error']['Message'])
     return
 
   key_status = key_metadata['KeyState']
-  
+
   if key_status == "PendingDeletion":
     try:
       result = kms.cancel_key_deletion(KeyId = key_id)
- 
+
     except ClientError as e:
       print(e.response['Error']['Message'])
       return
@@ -70,5 +70,5 @@ def remediate(session, alert, lambda_context):
     except ClientError as e:
       print(e.response['Error']['Message'])
     else:
-      print('KMS key disabled for Customer Master Key: {}.'.format(key_id))
+      print(f'KMS key disabled for Customer Master Key: {key_id}.')
   return

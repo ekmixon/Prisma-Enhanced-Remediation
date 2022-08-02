@@ -51,11 +51,9 @@ def remediate(session, alert, lambda_context):
     print(e.response['Error']['Message'])
     return
 
-  unassociated = []
-
-  for eip in eips:
-    if 'AssociationId' not in eip:
-      unassociated.append(eip['AllocationId'])
+  unassociated = [
+      eip['AllocationId'] for eip in eips if 'AssociationId' not in eip
+  ]
 
   for id in unassociated:
     try:
@@ -63,7 +61,7 @@ def remediate(session, alert, lambda_context):
     except ClientError as e:
       print(e.response['Error']['Message'])
     else:
-      print('Released unassociated EIP {} in the {} region.'.format(id, region))
+      print(f'Released unassociated EIP {id} in the {region} region.')
 
   return
 

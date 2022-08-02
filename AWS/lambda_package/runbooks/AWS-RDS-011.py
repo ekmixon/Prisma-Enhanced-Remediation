@@ -87,7 +87,7 @@ def remediate(session, alert, lambda_context):
       except ClientError as e:
         print(e.response['Error']['Message'])
       else:
-        print('Enabled \'AutoMinorVersionUpgrade\' for RDS instance {}.'.format(instance_id))
+        print(f"Enabled \'AutoMinorVersionUpgrade\' for RDS instance {instance_id}.")
 
   return
 

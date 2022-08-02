@@ -79,7 +79,7 @@ def remediate(session, alert, lambda_context):
       print('Failed to create a Support Role to manage incidents with AWS Support.')
 
   else:
-    print('AWS Support policy has one or more attachments: {}'.format(support_policy_arn))
+    print(f'AWS Support policy has one or more attachments: {support_policy_arn}')
 
   return
 
@@ -100,7 +100,7 @@ def new_iam_user(iam):
 
   else:
     user_arn = user['User']['Arn']
-    print('New IAM Support User created: {}'.format(user_arn))
+    print(f'New IAM Support User created: {user_arn}')
 
     sleep(10)  # Wait for IAM resource to be available. >> Gotta be a better way.. { wait? get? }.
 
@@ -124,7 +124,7 @@ def new_iam_role(iam, user_arn):
 
   else:
     role_arn  = role['Role']['Arn']
-    print('New IAM Support Role created: {}'.format(role_arn))
+    print(f'New IAM Support Role created: {role_arn}')
 
   try:
     result = iam.attach_role_policy(
@@ -134,26 +134,23 @@ def new_iam_role(iam, user_arn):
   except ClientError as e:
     print(e.response['Error']['Message'])
     return 'fail'
-    
+
   return role_arn
 
 
 class Template():
 
-  def RolePolicy(user_arn):
+  def RolePolicy(self):
 
-    Policy =  {
-                'Version': '2008-10-17',
-                'Statement': [
-                  {
-                    'Effect': 'Allow',
-                    'Principal': {
-                      'AWS': user_arn
-                    },
-                    'Action': 'sts:AssumeRole'
-                  }
-                ]
-              }
-
-    return Policy
+    return {
+        'Version':
+        '2008-10-17',
+        'Statement': [{
+            'Effect': 'Allow',
+            'Principal': {
+                'AWS': self
+            },
+            'Action': 'sts:AssumeRole',
+        }],
+    }
 

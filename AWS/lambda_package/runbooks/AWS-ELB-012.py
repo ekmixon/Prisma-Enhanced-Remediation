@@ -79,7 +79,7 @@ def enable_cross_zone(elb, elb_name):
   except ClientError as e:
     print(e.response['Error']['Message'])
   else:
-    print('Enabled Cross-Zone Load Balancing for ELB {}.'.format(elb_name))
+    print(f'Enabled Cross-Zone Load Balancing for ELB {elb_name}.')
 
   return
 

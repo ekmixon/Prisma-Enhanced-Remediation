@@ -89,9 +89,9 @@ def remediate(session, alert, lambda_context):
   flow_id = new_flow_logs(ec2, vpc_id, log_group_name, role_arn) if (log_group_name != 'fail') else 'fail'
 
   if flow_id != 'fail':
-    print('VPC Flow Logs enabled for VPC: {}'.format(vpc_id))
+    print(f'VPC Flow Logs enabled for VPC: {vpc_id}')
   else:
-    print('Failed to enable VPC Flow Logs for VPC: {}'.format(vpc_id))
+    print(f'Failed to enable VPC Flow Logs for VPC: {vpc_id}')
 
   return
 
@@ -109,7 +109,7 @@ def new_iam_role(iam):
     )
     role_arn  = role['Role']['Arn']
 
-    print('New IAM Role created: {}'.format(role_arn))
+    print(f'New IAM Role created: {role_arn}')
 
   except ClientError as e:
     if e.response['Error']['Code'] == 'EntityAlreadyExists':
@@ -118,7 +118,7 @@ def new_iam_role(iam):
       )
       role_arn  = role['Role']['Arn']
 
-      print('Using existing IAM Role: {}'.format(role_arn))
+      print(f'Using existing IAM Role: {role_arn}')
 
     else:
       print(e.response['Error']['Message'])
@@ -149,11 +149,11 @@ def new_log_group(logs, vpc_id):
       logGroupName = log_group_name
     )
 
-    print('New CloudWatch Logs group created: {}'.format(log_group_name))
+    print(f'New CloudWatch Logs group created: {log_group_name}')
 
   except ClientError as e:
     if e.response['Error']['Code'] == 'ResourceAlreadyExistsException':
-      print('Using existing CloudWatch Log group: {}'.format(log_group_name))
+      print(f'Using existing CloudWatch Log group: {log_group_name}')
     else:
       print(e.response['Error']['Message'])
       return 'fail'
@@ -188,7 +188,7 @@ def new_flow_logs(ec2, vpc_id, log_group_name, role_arn):
 
   flow_id = flow_logs['FlowLogIds'][0]
 
-  print('New Flow Logs created: {}'.format(flow_id))
+  print(f'New Flow Logs created: {flow_id}')
 
   return flow_id
 

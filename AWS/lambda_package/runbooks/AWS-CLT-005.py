@@ -70,7 +70,7 @@ def enable_validation(clt, trail_name):
   except ClientError as e:
     print(e.response['Error']['Message'])
   else:
-    print('Enabled log file validation for Trail {}.'.format(trail_name))
+    print(f'Enabled log file validation for Trail {trail_name}.')
 
   return
 

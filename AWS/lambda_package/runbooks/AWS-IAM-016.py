@@ -58,8 +58,8 @@ def remediate(session, alert, lambda_context):
 
     client = session.client('iam')
 
-    print('Modifying policy: {}'.format(alert['resource_id']))
-    
+    print(f"Modifying policy: {alert['resource_id']}")
+
     try:
         resp = client.create_policy_version(
             PolicyArn = resource_id,
@@ -69,5 +69,5 @@ def remediate(session, alert, lambda_context):
 
     except Exception as e:
         raise e
-    
+
     return 0

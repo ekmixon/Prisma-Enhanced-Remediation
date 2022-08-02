@@ -54,7 +54,7 @@ def remediate(session, alert, lambda_context):
         }
       ]
     )['DBInstances']
-    
+
   except ClientError as e:
     print(e.response['Error']['Message'])
     return
@@ -64,7 +64,7 @@ def remediate(session, alert, lambda_context):
   except (KeyError, IndexError):
     public = False
 
-  if public == True: 
+  if public: 
 
     instance_id = db_instance[0]['DBInstanceIdentifier']
 
@@ -78,7 +78,7 @@ def remediate(session, alert, lambda_context):
       return
 
     else:
-      print('Removed public attribute from RDS instance {}.'.format(instance_id))
+      print(f'Removed public attribute from RDS instance {instance_id}.')
 
   return
 

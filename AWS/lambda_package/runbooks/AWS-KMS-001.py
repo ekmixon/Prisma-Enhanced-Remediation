@@ -51,7 +51,7 @@ def remediate(session, alert, lambda_context):
     return
 
   else:
-    print('KMS key rotation enabled for Customer Master Key: {}.'.format(key_id))
+    print(f'KMS key rotation enabled for Customer Master Key: {key_id}.')
 
   return
 

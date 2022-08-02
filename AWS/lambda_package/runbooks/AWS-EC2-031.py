@@ -62,7 +62,9 @@ def remediate(session, alert, lambda_context):
 
   for function in functions:
     if check == True:
-      print('Security group {} is tied to a Lambda function. No remediation performed.'.format(sg_id))
+      print(
+          f'Security group {sg_id} is tied to a Lambda function. No remediation performed.'
+      )
       return
 
     try:
@@ -92,7 +94,7 @@ def delete_unused_sg(ec2, sg_id):
   except ClientError as e:
     print(e.response['Error']['Message'])
   else:
-    print('Removed unused security group {}.'.format(sg_id))
+    print(f'Removed unused security group {sg_id}.')
 
   return
 

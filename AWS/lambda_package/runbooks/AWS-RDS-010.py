@@ -86,7 +86,7 @@ def remediate(session, alert, lambda_context):
       except ClientError as e:
         print(e.response['Error']['Message'])
       else:
-        print('Enabled \'MultiAZ\' for RDS instance {}.'.format(instance_id))
+        print(f"Enabled \'MultiAZ\' for RDS instance {instance_id}.")
 
   return
 

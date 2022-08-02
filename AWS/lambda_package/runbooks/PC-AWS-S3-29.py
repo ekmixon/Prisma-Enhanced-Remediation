@@ -63,6 +63,6 @@ def remediate(session, alert, lambda_context):
   except ClientError as e:
     print(e.response['Error']['Message'])
   else:
-    print('Public access removed from S3 bucket {}.'.format(bucket_name))
+    print(f'Public access removed from S3 bucket {bucket_name}.')
 
   return

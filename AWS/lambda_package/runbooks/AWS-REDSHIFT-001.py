@@ -57,7 +57,7 @@ def remediate(session, alert, lambda_context):
   except (KeyError, IndexError):
     public = False
 
-  if public == True: 
+  if public: 
 
     try:
       redshift.modify_cluster(
@@ -69,7 +69,7 @@ def remediate(session, alert, lambda_context):
       return
 
     else:
-      print('Removed public attribute from Redshift cluster {}.'.format(cluster_id))
+      print(f'Removed public attribute from Redshift cluster {cluster_id}.')
 
   return
 

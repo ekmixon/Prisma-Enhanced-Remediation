@@ -60,7 +60,7 @@ def remediate(session, alert, lambda_context):
     return
 
   else:
-    print('Server Side Encryption enabled for S3 bucket: {}.'.format(bucket))
+    print(f'Server Side Encryption enabled for S3 bucket: {bucket}.')
 
   return
 

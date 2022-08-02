@@ -32,7 +32,7 @@ Note: The "body" field must be a single line.
 """
 
 def remediate(session, alert, lambda_context):
-    print('This runbook is invoked by {}'.format(lambda_context.invoked_function_arn))
+    print(f'This runbook is invoked by {lambda_context.invoked_function_arn}')
     print('Runbook session Details:')
 
     client = session.client('sts')

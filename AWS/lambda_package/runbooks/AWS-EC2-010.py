@@ -67,7 +67,7 @@ def remediate(session, alert, lambda_context):
   try:
     ip_perms = group[0]['IpPermissions']
   except (IndexError, KeyError):
-    print('IP permissions not found for security group {}.'.format(sg_id))
+    print(f'IP permissions not found for security group {sg_id}.')
     return
 
   for ip_perm in ip_perms:

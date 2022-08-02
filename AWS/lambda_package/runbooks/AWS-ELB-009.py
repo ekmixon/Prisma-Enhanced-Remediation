@@ -83,7 +83,7 @@ def enable_conn_draining(elb, elb_name):
   except ClientError as e:
     print(e.response['Error']['Message'])
   else:
-    print('Enabled Connection Draining for ELB {}.'.format(elb_name))
+    print(f'Enabled Connection Draining for ELB {elb_name}.')
 
   return
 

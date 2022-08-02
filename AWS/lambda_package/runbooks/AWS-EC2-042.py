@@ -88,7 +88,7 @@ def remove_pub_snapshot_attrib(ec2, snapshot_id):
   except ClientError as e:
     print(e.response['Error']['Message'])
   else:
-    print('Removed "Public" attribute from EBS snapshot {}.'.format(snapshot_id))
+    print(f'Removed "Public" attribute from EBS snapshot {snapshot_id}.')
 
   return
 

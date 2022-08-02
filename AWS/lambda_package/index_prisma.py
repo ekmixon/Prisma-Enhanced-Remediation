@@ -76,7 +76,7 @@ def parse_alert_message(sqs_message):
         # Check for Prisma Cloud test notification
         if alert['alertId'] == 'P-0':
             return {'error': "Prisma Cloud Test Notification", 'data': alert['alertId']}
-            
+
         # Only remediate AWS
         #if alert['cloudType'] != 'aws':
         #    return {'error': "Cloud not AWS", 'data': alert}
@@ -97,12 +97,11 @@ def parse_alert_message(sqs_message):
         if parsed_alert['region'] == 'global':
             parsed_alert['region'] = 'us-east-1'
 
-        if alert['policyId'] in runbook_lookup:
-            parsed_alert['runbook_id'] = runbook_lookup[alert['policyId']]
-            return {'error': None, 'data': parsed_alert}
-        else:
+        if alert['policyId'] not in runbook_lookup:
             return {'error': "Runbook not found", 'data': parsed_alert}
 
+        parsed_alert['runbook_id'] = runbook_lookup[alert['policyId']]
+        return {'error': None, 'data': parsed_alert}
     except Exception as e:
         return {'error': str(e), 'data': None}
 
@@ -122,7 +121,7 @@ def get_credentials(account_id):
 
     cross_account_role_name = os.getenv('CROSS_ACCOUNT_ROLE_NAME', None)
 
-    if cross_account_role_name == None:
+    if cross_account_role_name is None:
         return {'error': 'Lambda env variable CROSS_ACCOUNT_ROLE_NAME not specified.', 'data': None}
 
     try:
@@ -142,7 +141,7 @@ def lambda_handler(event, context):
     Entry point which is invoked by Lambda
     """
 
-    print("#### Received {} record(s) ####".format(len(event['Records'])))
+    print(f"#### Received {len(event['Records'])} record(s) ####")
 
     for record in event['Records']:
         parsed_alert = parse_alert_message(record['body'])
@@ -150,7 +149,7 @@ def lambda_handler(event, context):
         if parsed_alert['data'] == 'P-0':
             print(parsed_alert['error'])
         else:
-            
+
             if parsed_alert['error'] is not None:
                 print('Error in SQS record. Raw message:', record)
                 raise Exception(parsed_alert['error'])
@@ -179,7 +178,7 @@ def lambda_handler(event, context):
                         )
                 else:
                     raise Exception(credentials['error'])
-                
+
             # Finally, execute the runbook
             print('Remediation for Prisma Cloud alert: ', parsed_alert['alert_id'])
             print('Alert detail: ', parsed_alert)

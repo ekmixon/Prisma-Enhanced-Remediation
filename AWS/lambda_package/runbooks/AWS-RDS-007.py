@@ -53,7 +53,7 @@ def remediate(session, alert, lambda_context):
   except ClientError as e:
     print(e.response['Error']['Message'])
     return
-    
+
   public = False
 
   for attrib in attributes:
@@ -64,7 +64,7 @@ def remediate(session, alert, lambda_context):
       except IndexError:
           continue
     else:
-      print('Unable to find public attribute for RDS snapshot {}.'.format(snapshot_id))
+      print(f'Unable to find public attribute for RDS snapshot {snapshot_id}.')
 
   if public == True:
 
@@ -77,7 +77,7 @@ def remediate(session, alert, lambda_context):
     try:
       results = rds.modify_db_snapshot_attribute(**snap_args)
 
-      print('Removed public attribute from RDS snapshot {}.'.format(snapshot_id))
+      print(f'Removed public attribute from RDS snapshot {snapshot_id}.')
 
     except ClientError as e:
       print(e.response['Error']['Message'])

@@ -93,9 +93,11 @@ def remediate(session, alert, lambda_context):
 
   # Result
   if trail_status != 'fail':
-    print('Integrated Trail {} with CloudWatch Logs group {}.'.format(trail_name, log_group_name))
+    print(
+        f'Integrated Trail {trail_name} with CloudWatch Logs group {log_group_name}.'
+    )
   else:
-    print('Failed to integrated Trail {} with CloudWatch Logs.'.format(trail_name))
+    print(f'Failed to integrated Trail {trail_name} with CloudWatch Logs.')
 
   return
 
@@ -113,7 +115,7 @@ def new_iam_role(iam):
     )
     role_arn  = role['Role']['Arn']
 
-    print('New IAM Role created: {}'.format(role_arn))
+    print(f'New IAM Role created: {role_arn}')
 
   except ClientError as e:
     if e.response['Error']['Code'] == 'EntityAlreadyExists':
@@ -122,7 +124,7 @@ def new_iam_role(iam):
       )
       role_arn  = role['Role']['Arn']
 
-      print('Using existing IAM Role: {}'.format(role_arn))
+      print(f'Using existing IAM Role: {role_arn}')
 
     else:
       print(e.response['Error']['Message'])
@@ -153,11 +155,11 @@ def new_log_group(logs):
       logGroupName = log_group_name
     )
 
-    print('New CloudWatch Logs group created: {}'.format(log_group_name))
+    print(f'New CloudWatch Logs group created: {log_group_name}')
 
   except ClientError as e:
     if e.response['Error']['Code'] == 'ResourceAlreadyExistsException':
-      print('Using existing CloudWatch Log group: {}'.format(log_group_name))
+      print(f'Using existing CloudWatch Log group: {log_group_name}')
     else:
       print(e.response['Error']['Message'])
       return 'fail'

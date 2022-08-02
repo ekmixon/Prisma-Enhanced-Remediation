@@ -71,7 +71,7 @@ def remediate(session, alert, lambda_context):
     enabled = None
 
   if enabled != None:
-    print('Logging already enabled for S3 bucket: {}.'.format(bucket_name))
+    print(f'Logging already enabled for S3 bucket: {bucket_name}.')
     return
 
   # Grab the AWS account Id
@@ -106,7 +106,7 @@ def new_s3_bucket(s3, account_id, region):
   Create new S3 target bucket OR return an existing one
   """
 
-  target_bucket = 's3accesslogs-' + account_id + '-' + region
+  target_bucket = f's3accesslogs-{account_id}-{region}'
 
   try:
     if region == 'us-east-1':
@@ -121,13 +121,13 @@ def new_s3_bucket(s3, account_id, region):
         CreateBucketConfiguration = {'LocationConstraint': region}
       )
 
-    print('New S3 target bucket created: {}'.format(target_bucket))
+    print(f'New S3 target bucket created: {target_bucket}')
 
   except ClientError as e:
     if e.response['Error']['Code'] == 'BucketAlreadyExists':
-      print('Using existing S3 target bucket: {}'.format(target_bucket))
+      print(f'Using existing S3 target bucket: {target_bucket}')
     elif e.response['Error']['Code'] == 'BucketAlreadyOwnedByYou':
-      print('Using already owned and existing S3 target bucket: {}'.format(target_bucket))
+      print(f'Using already owned and existing S3 target bucket: {target_bucket}')
     else:
       print(e.response['Error']['Message'])
       return 'fail'
@@ -154,7 +154,7 @@ def update_s3_bucket(s3, bucket_name, target_bucket):
     print(e.response['Error']['Message'])
 
   else:
-    print('Logging enabled for S3 bucket: {}.'.format(bucket_name))
+    print(f'Logging enabled for S3 bucket: {bucket_name}.')
 
   return
 

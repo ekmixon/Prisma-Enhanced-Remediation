@@ -81,7 +81,7 @@ def remediate(session, alert, lambda_context):
 
   # Is this the default VPC?
   if is_default != True:
-    print('VPC {} is not the default.'.format(vpc_id))
+    print(f'VPC {vpc_id} is not the default.')
     return
 
   # Are there any existing resources?  Since most resources attach an ENI, let's check..
@@ -99,7 +99,7 @@ def remediate(session, alert, lambda_context):
     return
 
   if eni:
-    print('VPC {} has existing resources.'.format(vpc_id))
+    print(f'VPC {vpc_id} has existing resources.')
     return
 
   # Do the work..
@@ -284,7 +284,7 @@ def delete_vpc(ec2, vpc_id):
     print(e.response['Error']['Message'])
 
   else:
-    print('VPC {} has been deleted.'.format(vpc_id))
+    print(f'VPC {vpc_id} has been deleted.')
 
   return
 

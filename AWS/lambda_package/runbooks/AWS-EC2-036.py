@@ -73,7 +73,7 @@ def set_ami_to_private(ec2, image_id):
       }
     )
 
-    print('Removed "Public" LaunchPermission from AMI {}.'.format(image_id))
+    print(f'Removed "Public" LaunchPermission from AMI {image_id}.')
 
   except ClientError as e:
     print(e.response['Error']['Message'])
